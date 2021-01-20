@@ -1,79 +1,652 @@
 {
   "openapi": "3.0.0",
   "info": {
-    "title": "SegmentationServiceAPI REST API requests",
-    "version": "v1.0.0"
+     "description": "This service is responsible to manage different segment jobs for unified\nprofile",
+     "version": "19.4.1",
+     "title": "profile-segment-jobs API",
+     "termsOfService": ""
   },
-  "servers": [
-    {
-      "url": "https://my-server.com/"
-    }
-  ],
-  "components": {
-    "schemas": {
-    },
-    "requestBodies": {
-    },
-    "securitySchemes": {
-      "BearerAuth": {
-        "type": "http",
-        "scheme": "bearer"
-      },
-      "ApiKeyAuth": {
-        "type": "apiKey",
-        "in": "header",
-        "name": "X-Api-Key"
-      }
-    },
-    "parameters": {
-      "Cache-Control": {
-        "in": "header",
-        "name": "Cache-Control",
-        "required": false,
-        "schema": {
-          "type": "string",
-          "default": "no-cache"
-        }
-      },
-      "Content-Type": {
-        "in": "header",
-        "name": "Content-Type",
-        "required": false,
-        "schema": {
-          "type": "string",
-          "default": "application/json;charset=utf-8"
-        }
-      }
-    }
-  },
-  "security": [
-    {
-      "ApiKeyAuth": []
-    },
-    {
-      "BearerAuth": []
-    }
+  "tags": [
+     {
+        "name": "segmentJobs",
+        "description": "a segment job evaluates segment definitions on the given models and get\nall the qualifying XDM Entity Ids"
+     }
   ],
   "paths": {
-    "/something": {
-      "parameters": [
-        {
-          "$ref": "#/components/parameters/Cache-Control"
+     "/segment/jobs": {
+        "get": {
+           "tags": [
+              "segmentJobs"
+           ],
+           "summary": "Get a list of Segment Job Request",
+           "description": "",
+           "operationId": "get",
+           "parameters": [
+              {
+                 "name": "x-gw-ims-org-id",
+                 "in": "header",
+                 "description": "IMS Organization ID",
+                 "required": true,
+                 "example": "SFB235NHVHKV235H23V523K5@adobe.com",
+                 "schema": {
+                    "type": "string"
+                 }
+              },
+              {
+                 "name": "x-api-key",
+                 "in": "header",
+                 "description": "Service API Key",
+                 "required": true,
+                 "example": "wgo24jbo6bl3k5435345345",
+                 "schema": {
+                    "type": "string"
+                 }
+              },
+              {
+                 "name": "x-request-id",
+                 "in": "header",
+                 "description": "Request Id",
+                 "required": false,
+                 "example": "q0gf6caRuRtX2s5khaN1Zgd1OoEXcPJA",
+                 "schema": {
+                    "type": "string"
+                 }
+              },
+              {
+                 "name": "snapshot.name",
+                 "in": "query",
+                 "description": "The snapshot name",
+                 "required": false,
+                 "example": "inUS",
+                 "schema": {
+                    "type": "string"
+                 }
+              },
+              {
+                 "name": "start",
+                 "in": "query",
+                 "description": "Page Offset - As per created Time of resource",
+                 "required": false,
+                 "example": 1,
+                 "schema": {
+                    "type": "integer",
+                    "format": "int64"
+                 }
+              },
+              {
+                 "name": "limit",
+                 "in": "query",
+                 "description": "Page Size",
+                 "required": false,
+                 "example": 10,
+                 "schema": {
+                    "type": "integer"
+                 }
+              },
+              {
+                 "name": "status",
+                 "in": "query",
+                 "description": "The job status",
+                 "required": false,
+                 "example": "PROCESSING",
+                 "schema": {
+                    "type": "string"
+                 }
+              }
+           ],
+           "responses": {
+              "200": {
+                 "description": "List of Segment Job Request returned",
+                 "content": {
+                    "application/json": {
+                       "schema": {
+                          "$ref": "#/components/schemas/SegmentJob"
+                       }
+                    }
+                 }
+              },
+              "403": {
+                 "description": "Forbidden"
+              },
+              "500": {
+                 "description": "There was issue reading the segment job from DB"
+              },
+              "503": {
+                 "description": "Service Unavailable"
+              }
+           }
         },
-        {
-          "$ref": "#/components/parameters/Content-Type"
+        "post": {
+           "tags": [
+              "segmentJobs"
+           ],
+           "summary": "Post a Segment Job Request",
+           "description": "",
+           "operationId": "create",
+           "parameters": [
+              {
+                 "name": "x-gw-ims-org-id",
+                 "in": "header",
+                 "description": "IMS Organization ID",
+                 "required": true,
+                 "example": "southwest@adobe.com",
+                 "schema": {
+                    "type": "string"
+                 }
+              },
+              {
+                 "name": "x-api-key",
+                 "in": "header",
+                 "description": "Service API Key",
+                 "required": true,
+                 "example": "aep_api_key",
+                 "schema": {
+                    "type": "string"
+                 }
+              },
+              {
+                 "name": "x-profile-instance-id",
+                 "in": "header",
+                 "description": "Profile Instance ID",
+                 "required": true,
+                 "example": "ups",
+                 "schema": {
+                    "type": "string"
+                 }
+              },
+              {
+                 "name": "x-request-id",
+                 "in": "header",
+                 "description": "Request Id",
+                 "required": false,
+                 "example": "q0gf6caRuRtX2s5khaN1Zgd1OoEXcPJA",
+                 "schema": {
+                    "type": "string"
+                 }
+              }
+           ],
+           "requestBody": {
+              "content": {
+                 "application/json": {
+                    "schema": {
+                       "type": "array",
+                       "items": {
+                          "$ref": "#/components/schemas/SegmentJobRequest"
+                       }
+                    }
+                 }
+              },
+              "description": "List of segment jobs. Each should be in Json format.",
+              "required": true
+           },
+           "responses": {
+              "200": {
+                 "description": "Segment Job Request successfully posted",
+                 "content": {
+                    "application/json": {
+                       "schema": {
+                          "$ref": "#/components/schemas/SegmentJob"
+                       }
+                    }
+                 }
+              },
+              "400": {
+                 "description": "Please double check your post body"
+              },
+              "403": {
+                 "description": "Forbidden"
+              },
+              "429": {
+                 "description": "Too many segmentation jobs in processing at the moment. Please try\nagain at a later time!"
+              },
+              "500": {
+                 "description": "There was issue reading the segment job from DB"
+              },
+              "503": {
+                 "description": "Service Unavailable"
+              }
+           }
         }
-      ],
-      "get": {
-        "summary": "Get something",
-        "operationId": "getSomething",
-        "tags": ["mytag"],
-        "responses": {
-          "default": {
-            "description": ""
-          }
+     },
+     "/segment/jobs/{segmentJobId}": {
+        "get": {
+           "tags": [
+              "segmentJobs"
+           ],
+           "summary": "Return the Segment Job Request by id",
+           "description": "",
+           "operationId": "getById",
+           "parameters": [
+              {
+                 "name": "x-gw-ims-org-id",
+                 "in": "header",
+                 "description": "IMS Organization ID",
+                 "required": true,
+                 "example": "southwest@adobe.com",
+                 "schema": {
+                    "type": "string"
+                 }
+              },
+              {
+                 "name": "x-api-key",
+                 "in": "header",
+                 "description": "Service API Key",
+                 "required": true,
+                 "example": "aep_api_key",
+                 "schema": {
+                    "type": "string"
+                 }
+              },
+              {
+                 "name": "x-request-id",
+                 "in": "header",
+                 "description": "Request Id",
+                 "required": false,
+                 "example": "q0gf6caRuRtX2s5khaN1Zgd1OoEXcPJA",
+                 "schema": {
+                    "type": "string"
+                 }
+              },
+              {
+                 "name": "segmentJobId",
+                 "in": "path",
+                 "description": "Segment Jobs Request Id",
+                 "required": true,
+                 "example": "ca8fe8a8-0f38-478a-9905-fd515d1d2988",
+                 "schema": {
+                    "type": "string"
+                 }
+              }
+           ],
+           "responses": {
+              "200": {
+                 "description": "Segment Job Request successfully returned",
+                 "content": {
+                    "application/json": {
+                       "schema": {
+                          "$ref": "#/components/schemas/SegmentJob"
+                       }
+                    }
+                 }
+              },
+              "403": {
+                 "description": "Forbidden"
+              },
+              "404": {
+                 "description": "Segment Job Request not found"
+              },
+              "503": {
+                 "description": "Service Unavailable"
+              }
+           }
+        },
+        "delete": {
+           "tags": [
+              "segmentJobs"
+           ],
+           "summary": "Cancel a Segment Job Request by id",
+           "description": "",
+           "operationId": "cancel",
+           "parameters": [
+              {
+                 "name": "x-gw-ims-org-id",
+                 "in": "header",
+                 "description": "IMS Organization ID",
+                 "required": true,
+                 "example": "southwest@adobe.com",
+                 "schema": {
+                    "type": "string"
+                 }
+              },
+              {
+                 "name": "x-api-key",
+                 "in": "header",
+                 "description": "Service API Key",
+                 "required": true,
+                 "example": "aep_api_key",
+                 "schema": {
+                    "type": "string"
+                 }
+              },
+              {
+                 "name": "x-request-id",
+                 "in": "header",
+                 "description": "Request Id",
+                 "required": false,
+                 "example": "q0gf6caRuRtX2s5khaN1Zgd1OoEXcPJA",
+                 "schema": {
+                    "type": "string"
+                 }
+              },
+              {
+                 "name": "segmentJobId",
+                 "in": "path",
+                 "description": "Segment Jobs Request Id",
+                 "required": true,
+                 "example": "ca8fe8a8-0f38-478a-9905-fd515d1d2988",
+                 "schema": {
+                    "type": "string"
+                 }
+              }
+           ],
+           "responses": {
+              "200": {
+                 "description": "Segment Job Request has been marked for cancelling",
+                 "content": {
+                    "application/json": {
+                       "schema": {
+                          "$ref": "#/components/schemas/StandardResponse"
+                       }
+                    }
+                 }
+              },
+              "403": {
+                 "description": "Forbidden"
+              },
+              "404": {
+                 "description": "Segment Job Request not found"
+              },
+              "503": {
+                 "description": "Service Unavailable"
+              }
+           }
         }
-      }
-    }
+     }
+  },
+  "servers": [
+     {
+        "url": "https://platform.adobe.io/data/core/ups/"
+     }
+  ],
+  "components": {
+     "schemas": {
+        "ErrorResponse": {
+           "type": "object",
+           "properties": {
+              "code": {
+                 "type": "string",
+                 "example": 80000018,
+                 "description": "batch segmentation job error code"
+              },
+              "msg": {
+                 "type": "string",
+                 "example": "com.microsoft.azure.documentdb.DocumentClientException: Message:\n{\"Errors\":[\"Request rate is large\"]}",
+                 "description": "batch segmentation job error message"
+              },
+              "callStack": {
+                 "type": "string",
+                 "description": "call stack"
+              }
+           },
+           "description": "Error response from the batch job"
+        },
+        "FeedbackMetrics": {
+           "type": "object",
+           "properties": {
+              "startTimeInMs": {
+                 "type": "number",
+                 "example": 123456789000,
+                 "description": "Start time in ms"
+              },
+              "endTimeInMs": {
+                 "type": "number",
+                 "example": 123456799000,
+                 "description": "End time in ms"
+              },
+              "totalTimeInMs": {
+                 "type": "number",
+                 "example": 10000,
+                 "description": "Total time in ms (End time - Start time)"
+              }
+           },
+           "description": "Feedback Metrics"
+        },
+        "SegmentJob": {
+           "type": "object",
+           "required": [
+              "errors",
+              "metrics",
+              "segments"
+           ],
+           "properties": {
+              "id": {
+                 "type": "string",
+                 "example": "468eeefd-95a2-45a1-8bfc-b806dafce7ee",
+                 "description": "Segment job request id"
+              },
+              "imsOrgId": {
+                 "type": "string",
+                 "example": "1BD6382559DF0C130A49422D@AdobeOrg",
+                 "description": "IMS org id"
+              },
+              "profileInstanceId": {
+                 "type": "string",
+                 "example": "1BD6382559DF0C130A49422D@AdobeOrg",
+                 "description": "Profile instance id"
+              },
+              "status": {
+                 "type": "string",
+                 "example": "PROCESSING",
+                 "description": "Job status",
+                 "enum": [
+                    "NEW",
+                    "PROCESSING",
+                    "CANCELLING",
+                    "CANCELLED",
+                    "FAILED",
+                    "SUCCEEDED"
+                 ]
+              },
+              "computeJobId": {
+                 "type": "integer",
+                 "format": "int64",
+                 "example": 1,
+                 "description": "Compute job id"
+              },
+              "computeGatewayJobId": {
+                 "type": "string",
+                 "example": "c3505859-d256-45d0-a6f3-c25f8f8508f5",
+                 "description": "Compute gateway job id, which can be use to get the job status from\ncompute gateway API"
+              },
+              "creationTime": {
+                 "type": "integer",
+                 "format": "int64",
+                 "example": 1233456789000,
+                 "description": "Unix timestamp when the job is created, in milliseconds"
+              },
+              "updateTime": {
+                 "type": "integer",
+                 "format": "int64",
+                 "example": 1233456789000,
+                 "description": "Unix timestamp when the job is updated, in milliseconds"
+              },
+              "segments": {
+                 "type": "array",
+                 "items": {
+                    "$ref": "#/components/schemas/SegmentInfo"
+                 }
+              },
+              "errors": {
+                 "type": "array",
+                 "items": {
+                    "$ref": "#/components/schemas/ErrorResponse"
+                 }
+              },
+              "metrics": {
+                 "type": "object",
+                 "required": [
+                    "profileSegmentationTime",
+                    "totalTime"
+                 ],
+                 "properties": {
+                    "totalTime": {
+                       "$ref": "#/components/schemas/FeedbackMetrics"
+                    },
+                    "profileSegmentationTime": {
+                       "$ref": "#/components/schemas/FeedbackMetrics"
+                    }
+                 },
+                 "description": "Segment job request metrics"
+              },
+              "requestId": {
+                 "type": "string",
+                 "example": "cc3d3381-8682-41d4-93bd-566e378624d3",
+                 "description": "Request id, which can be used to trace the request along multiple\ncomponents"
+              },
+              "modelName": {
+                 "type": "string",
+                 "example": "_xdm.context.profile",
+                 "description": "model name"
+              },
+              "_links": {
+                 "type": "object",
+                 "description": "Useful links to get the job status or cancel a submitted job.",
+                 "additionalProperties": {
+                    "type": "number"
+                 }
+              }
+           }
+        },
+        "Expression": {
+           "type": "object",
+           "properties": {
+              "type": {
+                 "type": "string",
+                 "example": "PQL",
+                 "description": "expression type",
+                 "enum": [
+                    "PQL",
+                    "ARL"
+                 ]
+              },
+              "format": {
+                 "type": "string",
+                 "example": "pql/text",
+                 "description": "expression format",
+                 "enum": [
+                    "pql/text",
+                    "pql/json"
+                 ]
+              },
+              "value": {
+                 "type": "string",
+                 "example": "workAddress.country = \"US\"",
+                 "description": "PQL query string"
+              }
+           },
+           "description": "segment expression, part of a segment meta data response"
+        },
+        "SegmentInfo": {
+           "type": "object",
+           "required": [
+              "segment",
+              "snapshot"
+           ],
+           "properties": {
+              "segmentId": {
+                 "type": "string",
+                 "example": "7863c010-e092-41c8-ae5e-9e533186752e",
+                 "description": "segment id"
+              },
+              "segment": {
+                 "type": "object",
+                 "required": [
+                    "expression",
+                    "mergePolicy"
+                 ],
+                 "properties": {
+                    "id": {
+                       "type": "string",
+                       "example": "7863c010-e092-41c8-ae5e-9e533186752e",
+                       "description": "segment id"
+                    },
+                    "version": {
+                       "type": "integer",
+                       "format": "int32",
+                       "example": 1,
+                       "description": "segment version"
+                    },
+                    "expression": {
+                       "$ref": "#/components/schemas/Expression"
+                    },
+                    "mergePolicy": {
+                       "type": "object",
+                       "properties": {
+                          "id": {
+                             "type": "string",
+                             "example": "ups-default",
+                             "description": "merge policy id"
+                          },
+                          "version": {
+                             "type": "integer",
+                             "format": "int32",
+                             "example": 1,
+                             "description": "merge policy version"
+                          }
+                       },
+                       "description": "merge policy, part of a segment meta data response"
+                    }
+                 },
+                 "description": "Segment meta data in a segment job response"
+              },
+              "snapshot": {
+                 "$ref": "#/components/schemas/SegmentSnapshot"
+              }
+           },
+           "description": "Segment Job Response"
+        },
+        "SegmentSnapshot": {
+           "type": "object",
+           "required": [
+              "name"
+           ],
+           "properties": {
+              "name": {
+                 "type": "string",
+                 "example": "inUS",
+                 "description": "snapshot name"
+              },
+              "ttlInDays": {
+                 "type": "integer",
+                 "format": "int32",
+                 "example": 10,
+                 "description": "TTL in days"
+              }
+           },
+           "description": "Snapshot has not been supported yet. Do not use!!!"
+        },
+        "StandardResponse": {
+           "type": "object",
+           "properties": {
+              "code": {
+                 "type": "string",
+                 "example": "200",
+                 "description": "standard response code"
+              },
+              "message": {
+                 "type": "string",
+                 "example": "Segment job with id '468eeefd-95a2-45a1-8bfc-b806dafce7ee' has been\ndeleted",
+                 "description": "response message"
+              }
+           },
+           "description": "Standard Response"
+        },
+        "SegmentJobRequest": {
+           "type": "object",
+           "required": [
+              "segmentId"
+           ],
+           "properties": {
+              "segmentId": {
+                 "type": "string",
+                 "example": "7863c010-e092-41c8-ae5e-9e533186752e",
+                 "description": "segment id"
+              },
+              "snapshot": {
+                 "$ref": "#/components/schemas/SegmentSnapshot"
+              }
+           }
+        }
+     }
   }
 }

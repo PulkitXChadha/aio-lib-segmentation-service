@@ -7,6 +7,7 @@
     "@adobe/aio-lib-core-errors": "^3.0.0",
     "@adobe/aio-lib-core-logging": "^1.1.2",
     "cross-fetch": "^3.0.4",
+    "fetch-mock": "^9.11.0",
     "swagger-client": "3.9.6"
   },
   "deprecated": false,
@@ -51,7 +52,8 @@
     "lint": "eslint src test e2e",
     "test": "npm run validate && npm run lint && npm run unit-tests",
     "typings": "jsdoc -t node_modules/tsd-jsdoc/dist -r src/*.js -d .",
-    "unit-tests": "jest --config test/jest.config.js --maxWorkers=2",
+    "unit-tests": "jest --silent=false --config test/jest.config.js --maxWorkers=2",
+    "unit-tests-silent": "jest --silent=false --maxWorkers=2",
     "validate": "node bin/validate_spec.js spec/api.json"
   },
   "version": "0.0.1"
