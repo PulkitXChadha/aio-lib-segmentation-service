@@ -22,8 +22,6 @@ const gApiKey = "test-apiKey";
 const gAccessToken = "test-accessToken";
 const gSandbox = "test-sandbox";
 
-var sdkClient = {};
-
 const createSwaggerOptions = ({ body } = {}) => {
   return createRequestOptions({
     tenantId: gTenantId,
@@ -46,13 +44,14 @@ function mockResponseWithMethod(url, method, response) {
 }
 
 test("sdk init test", async () => {
-  sdkClient = await createSdkClient();
+  const sdkClient = await createSdkClient();
 
   expect(sdkClient.tenantId).toBe(gTenantId);
   expect(sdkClient.apiKey).toBe(gApiKey);
   expect(sdkClient.imsOrgId).toBe(gImsOrgId);
   expect(sdkClient.accessToken).toBe(gAccessToken);
   expect(sdkClient.sandbox).toBe(gSandbox);
+
 });
 
 test("sdk init test - no tenantId", async () => {
@@ -88,7 +87,7 @@ test("sdk init test - no accessToken", async () => {
 });
 
 test.only("test getSegmentJobs", async () => {
-  sdkClient = await createSdkClient();
+  const sdkClient = await createSdkClient();
 
   const url = "https://platform.adobe.io/data/core/ups/segment/jobs";
   const method = "GET";

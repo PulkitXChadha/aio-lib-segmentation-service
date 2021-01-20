@@ -54,9 +54,9 @@ class SegmentationServiceAPI {
    * Initializes a SegmentationServiceAPI object and returns it.
    *
    * @param {string} tenantId the tenant id
+   * @param {string} imsOrgId the iMSOrgId for your integration
    * @param {string} apiKey the API key for your integration
    * @param {string} accessToken the access token for your integration
-   * @param {string} imsOrgId the iMSOrgId for your integration
    * @param {string} [sandbox] sandbox name
    * @returns {Promise<SegmentationServiceAPI>} a SegmentationServiceAPI object
    */
@@ -88,7 +88,7 @@ class SegmentationServiceAPI {
       spec: spec,
       usePromise: true,
     });
-    this.sdk = await swagger;
+    this.sdk = (await swagger);
     this.tenantId = tenantId;
     this.imsOrgId = imsOrgId;
     this.apiKey = apiKey;
@@ -109,12 +109,13 @@ class SegmentationServiceAPI {
    * @param {object} [options.headers] headers to pass to API call
    * @returns {Promise<Response>} a Promise resolving to a Response
    */
-  getSegmentJobs(options = {}) {
+  getSegmentJobs(options = { start: 0, limit: 100 }) {
+    console.log(JSON.stringify(options));
     const sdkDetails = options;
     const headers = options.headers ? options.headers : {};
     return new Promise((resolve, reject) => {
       this.sdk.apis.segmentJobs
-        .get(arguments[0], this.__createRequest({}, headers, {}))
+        .get(this.__createRequest({}, headers))
         .then((response) => {
           resolve(response);
         })
@@ -126,9 +127,8 @@ class SegmentationServiceAPI {
     });
   }
 
-  __createRequest(body, headers, defaultHeaders = {}) {
-    console.log(JSON.stringify(headers));
-    const finalHeaders = Object.assign(defaultHeaders, headers);
+  __createRequest(body, headers) {
+    const finalHeaders = Object.assign(headers);
     return {
       requestBody: body,
       server: "https://platform.adobe.io/data/core/ups",
@@ -139,7 +139,7 @@ class SegmentationServiceAPI {
   }
 
   __setHeaders(req, coreAPIInstance, headers) {
-    console.log(JSON.stringify(coreAPIInstance));
+    console.log(JSON.stringify(coreAPIInstance.imsOrgId));
     // set headers required for Segmentation API calls
     if (!req.headers["x-api-key"]) {
       req.headers["x-api-key"] = coreAPIInstance.apiKey;
