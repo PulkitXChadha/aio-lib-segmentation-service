@@ -22,36 +22,7 @@
            "description": "",
            "operationId": "get",
            "parameters": [
-              {
-                 "name": "x-gw-ims-org-id",
-                 "in": "header",
-                 "description": "IMS Organization ID",
-                 "required": true,
-                 "example": "SFB235NHVHKV235H23V523K5@adobe.com",
-                 "schema": {
-                    "type": "string"
-                 }
-              },
-              {
-                 "name": "x-api-key",
-                 "in": "header",
-                 "description": "Service API Key",
-                 "required": true,
-                 "example": "wgo24jbo6bl3k5435345345",
-                 "schema": {
-                    "type": "string"
-                 }
-              },
-              {
-                 "name": "x-request-id",
-                 "in": "header",
-                 "description": "Request Id",
-                 "required": false,
-                 "example": "q0gf6caRuRtX2s5khaN1Zgd1OoEXcPJA",
-                 "schema": {
-                    "type": "string"
-                 }
-              },
+
               {
                  "name": "snapshot.name",
                  "in": "query",
@@ -124,46 +95,7 @@
            "description": "",
            "operationId": "create",
            "parameters": [
-              {
-                 "name": "x-gw-ims-org-id",
-                 "in": "header",
-                 "description": "IMS Organization ID",
-                 "required": true,
-                 "example": "southwest@adobe.com",
-                 "schema": {
-                    "type": "string"
-                 }
-              },
-              {
-                 "name": "x-api-key",
-                 "in": "header",
-                 "description": "Service API Key",
-                 "required": true,
-                 "example": "aep_api_key",
-                 "schema": {
-                    "type": "string"
-                 }
-              },
-              {
-                 "name": "x-profile-instance-id",
-                 "in": "header",
-                 "description": "Profile Instance ID",
-                 "required": true,
-                 "example": "ups",
-                 "schema": {
-                    "type": "string"
-                 }
-              },
-              {
-                 "name": "x-request-id",
-                 "in": "header",
-                 "description": "Request Id",
-                 "required": false,
-                 "example": "q0gf6caRuRtX2s5khaN1Zgd1OoEXcPJA",
-                 "schema": {
-                    "type": "string"
-                 }
-              }
+
            ],
            "requestBody": {
               "content": {
@@ -217,36 +149,6 @@
            "description": "",
            "operationId": "getById",
            "parameters": [
-              {
-                 "name": "x-gw-ims-org-id",
-                 "in": "header",
-                 "description": "IMS Organization ID",
-                 "required": true,
-                 "example": "southwest@adobe.com",
-                 "schema": {
-                    "type": "string"
-                 }
-              },
-              {
-                 "name": "x-api-key",
-                 "in": "header",
-                 "description": "Service API Key",
-                 "required": true,
-                 "example": "aep_api_key",
-                 "schema": {
-                    "type": "string"
-                 }
-              },
-              {
-                 "name": "x-request-id",
-                 "in": "header",
-                 "description": "Request Id",
-                 "required": false,
-                 "example": "q0gf6caRuRtX2s5khaN1Zgd1OoEXcPJA",
-                 "schema": {
-                    "type": "string"
-                 }
-              },
               {
                  "name": "segmentJobId",
                  "in": "path",

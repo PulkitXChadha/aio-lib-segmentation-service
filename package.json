@@ -3,40 +3,8 @@
     "url": "https://github.com/@adobe/aio-lib-segmentation-service/issues"
   },
   "bundleDependencies": false,
-  "dependencies": {
-    "@adobe/aio-lib-core-errors": "^3.0.0",
-    "@adobe/aio-lib-core-logging": "^1.1.2",
-    "cross-fetch": "^3.0.4",
-    "fetch-mock": "^9.11.0",
-    "swagger-client": "3.9.6"
-  },
   "deprecated": false,
   "description": "Adobe I/O Lib",
-  "devDependencies": {
-    "@adobe/eslint-config-aio-lib-config": "^1.2.0",
-    "@types/node-fetch": "^2.5.4",
-    "babel-runtime": "^6.26.0",
-    "codecov": "^3.5.0",
-    "dotenv": "^8.1.0",
-    "eol": "^0.9.1",
-    "eslint": "^6.2.2",
-    "eslint-config-standard": "^14.1.0",
-    "eslint-plugin-import": "^2.18.0",
-    "eslint-plugin-jest": "^23.1.1",
-    "eslint-plugin-jsdoc": "^25.0.1",
-    "eslint-plugin-node": "^11.1.0",
-    "eslint-plugin-promise": "^4.2.1",
-    "eslint-plugin-standard": "^4.0.0",
-    "jest": "^24.8.0",
-    "jest-fetch-mock": "^3.0.2",
-    "jest-junit": "^10.0.0",
-    "jest-plugin-fs": "^2.9.0",
-    "jsdoc": "^3.6.3",
-    "jsdoc-to-markdown": "^5.0.0",
-    "openapi-schema-validator": "^3.0.3",
-    "stdout-stderr": "^0.1.9",
-    "tsd-jsdoc": "^2.4.0"
-  },
   "engines": {
     "node": ">=10.0.0"
   },
@@ -52,9 +20,43 @@
     "lint": "eslint src test e2e",
     "test": "npm run validate && npm run lint && npm run unit-tests",
     "typings": "jsdoc -t node_modules/tsd-jsdoc/dist -r src/*.js -d .",
-    "unit-tests": "jest --silent=false --config test/jest.config.js --maxWorkers=2",
-    "unit-tests-silent": "jest --silent=false --maxWorkers=2",
+    "unit-tests": "jest --silent=false",
+    "unit-tests-silent": "jest --silent=false",
     "validate": "node bin/validate_spec.js spec/api.json"
+  },
+  "dependencies": {
+    "swagger-client": "3.9.6",
+    "@adobe/aio-lib-core-errors": "^3.0.0",
+    "@adobe/aio-lib-core-logging": "1.1.0"
+  },
+  "devDependencies": {
+    "@adobe/eslint-config-aio-lib-config": "^1.2.0",
+    "codecov": "^3.6.1",
+    "dotenv": "^8.1.0",
+    "eslint": "^6.0.0",
+    "eslint-config-standard": "^14.1.1",
+    "eslint-plugin-import": "^2.22.0",
+    "eslint-plugin-jest": "^23.18.0",
+    "eslint-plugin-jsdoc": "^21.0.0",
+    "eslint-plugin-node": "^10.0.0",
+    "eslint-plugin-promise": "^4.2.1",
+    "eslint-plugin-standard": "^4.0.1",
+    "fetch-mock": "^9.11.0",
+    "jest": "^24.1.0",
+    "jest-cli": "^24.8.0",
+    "jest-junit": "^10.0.0",
+    "jest-plugin-fs": "^2.9.0",
+    "jsdoc-to-markdown": "^5.0.0",
+    "openapi-schema-validator": "^3.0.3"
+  },
+  "jest": {
+    "testPathIgnorePatterns": [
+      "<rootDir>/test/jest.setup.js"
+    ],
+    "testEnvironment": "node",
+    "setupFilesAfterEnv": [
+      "<rootDir>/test/jest.setup.js"
+    ]
   },
   "version": "0.0.1"
 }
