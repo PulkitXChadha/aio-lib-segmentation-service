@@ -20,14 +20,15 @@
     "lint": "eslint src test e2e",
     "test": "npm run validate && npm run lint && npm run unit-tests",
     "typings": "jsdoc -t node_modules/tsd-jsdoc/dist -r src/*.js -d .",
-    "unit-tests": "jest --silent=false",
-    "unit-tests-silent": "jest --silent=false",
-    "validate": "node bin/validate_spec.js spec/api.json"
+    "unit-tests": "jest --config test/jest.config.js --maxWorkers=2",
+    "validate": "node bin/validate_spec.js spec/api.json",
+    "unit-tests-silent": "jest --silent=false"
   },
   "dependencies": {
-    "swagger-client": "3.9.6",
     "@adobe/aio-lib-core-errors": "^3.0.0",
-    "@adobe/aio-lib-core-logging": "1.1.0"
+    "@adobe/aio-lib-core-logging": "1.1.0",
+    "stdout-stderr": "^0.1.13",
+    "swagger-client": "3.9.6"
   },
   "devDependencies": {
     "@adobe/eslint-config-aio-lib-config": "^1.2.0",
@@ -44,6 +45,7 @@
     "fetch-mock": "^9.11.0",
     "jest": "^24.1.0",
     "jest-cli": "^24.8.0",
+    "jest-fetch-mock": "^3.0.3",
     "jest-junit": "^10.0.0",
     "jest-plugin-fs": "^2.9.0",
     "jsdoc-to-markdown": "^5.0.0",

@@ -16,7 +16,7 @@ governing permissions and limitations under the License.
 [![License](https://img.shields.io/badge/License-Apache%202.0-blue.svg)](https://opensource.org/licenses/Apache-2.0)
 [![Codecov Coverage](https://img.shields.io/codecov/c/github/adobe/aio-lib-segmentation-service/master.svg?style=flat-square)](https://codecov.io/gh/adobe/aio-lib-segmentation-service/)
 
-# Adobe I/O ??? Lib
+# Adobe Experience Cloud Segmentation Service Lib
 
 ### Installing
 
@@ -80,9 +80,6 @@ Returns a new object (does not mutate original)</p>
 <dt><a href="#requestToString">requestToString(request)</a> ⇒ <code>object</code></dt>
 <dd><p>Converts a fetch Request object to a string.</p>
 </dd>
-<dt><a href="#init">init(tenantId, apiKey, accessToken)</a> ⇒ <code><a href="#SegmentationServiceAPI">Promise.&lt;SegmentationServiceAPI&gt;</a></code></dt>
-<dd><p>Returns a Promise that resolves with a new SegmentationServiceAPI object.</p>
-</dd>
 </dl>
 
 ## Typedefs
@@ -106,33 +103,12 @@ with valid values for tenantId, apiKey and accessToken
 **Kind**: global class  
 
 * [SegmentationServiceAPI](#SegmentationServiceAPI)
-    * [.tenantId](#SegmentationServiceAPI+tenantId) : <code>string</code>
-    * [.apiKey](#SegmentationServiceAPI+apiKey) : <code>string</code>
-    * [.accessToken](#SegmentationServiceAPI+accessToken) : <code>string</code>
-    * [.init(tenantId, apiKey, accessToken)](#SegmentationServiceAPI+init) ⇒ [<code>Promise.&lt;SegmentationServiceAPI&gt;</code>](#SegmentationServiceAPI)
-    * [.getSomething([parameters])](#SegmentationServiceAPI+getSomething) ⇒ <code>Promise.&lt;Response&gt;</code>
+    * [.init(tenantId, imsOrgId, apiKey, accessToken, [sandbox])](#SegmentationServiceAPI+init) ⇒ [<code>Promise.&lt;SegmentationServiceAPI&gt;</code>](#SegmentationServiceAPI)
+    * [.getSegmentJobs([options])](#SegmentationServiceAPI+getSegmentJobs) ⇒ <code>Promise.&lt;Response&gt;</code>
 
-<a name="SegmentationServiceAPI+tenantId"></a>
-
-### segmentationServiceAPI.tenantId : <code>string</code>
-The tenant id
-
-**Kind**: instance property of [<code>SegmentationServiceAPI</code>](#SegmentationServiceAPI)  
-<a name="SegmentationServiceAPI+apiKey"></a>
-
-### segmentationServiceAPI.apiKey : <code>string</code>
-The api key from your integration
-
-**Kind**: instance property of [<code>SegmentationServiceAPI</code>](#SegmentationServiceAPI)  
-<a name="SegmentationServiceAPI+accessToken"></a>
-
-### segmentationServiceAPI.accessToken : <code>string</code>
-The access token from your integration
-
-**Kind**: instance property of [<code>SegmentationServiceAPI</code>](#SegmentationServiceAPI)  
 <a name="SegmentationServiceAPI+init"></a>
 
-### segmentationServiceAPI.init(tenantId, apiKey, accessToken) ⇒ [<code>Promise.&lt;SegmentationServiceAPI&gt;</code>](#SegmentationServiceAPI)
+### segmentationServiceAPI.init(tenantId, imsOrgId, apiKey, accessToken, [sandbox]) ⇒ [<code>Promise.&lt;SegmentationServiceAPI&gt;</code>](#SegmentationServiceAPI)
 Initializes a SegmentationServiceAPI object and returns it.
 
 **Kind**: instance method of [<code>SegmentationServiceAPI</code>](#SegmentationServiceAPI)  
@@ -141,20 +117,29 @@ Initializes a SegmentationServiceAPI object and returns it.
 | Param | Type | Description |
 | --- | --- | --- |
 | tenantId | <code>string</code> | the tenant id |
+| imsOrgId | <code>string</code> | the iMSOrgId for your integration |
 | apiKey | <code>string</code> | the API key for your integration |
 | accessToken | <code>string</code> | the access token for your integration |
+| [sandbox] | <code>string</code> | sandbox name |
 
-<a name="SegmentationServiceAPI+getSomething"></a>
+<a name="SegmentationServiceAPI+getSegmentJobs"></a>
 
-### segmentationServiceAPI.getSomething([parameters]) ⇒ <code>Promise.&lt;Response&gt;</code>
-Get something.
+### segmentationServiceAPI.getSegmentJobs([options]) ⇒ <code>Promise.&lt;Response&gt;</code>
+Get Segment Jobs
+a segment job evaluates segment definitions on the given models and get all the qualifying XDM Entity Ids.
 
 **Kind**: instance method of [<code>SegmentationServiceAPI</code>](#SegmentationServiceAPI)  
-**Returns**: <code>Promise.&lt;Response&gt;</code> - the response  
+**Returns**: <code>Promise.&lt;Response&gt;</code> - a Promise resolving to a Response  
 
 | Param | Type | Default | Description |
 | --- | --- | --- | --- |
-| [parameters] | [<code>MyParameters</code>](#MyParameters) | <code>{}</code> | parameters to pass |
+| [options] | <code>object</code> |  | to control Segment Jobs search |
+| [options.start] | <code>string</code> |  | Specifies the starting offset for the segment jobs returned. |
+| [options.limit] | <code>number</code> | <code>100</code> | Specifies the number of segment jobs returned per page. |
+| [options.status] | <code>number</code> |  | Filters the results based on status. The supported values are NEW, QUEUED, PROCESSING, SUCCEEDED, FAILED, CANCELLING, CANCELLED |
+| [options.sort] | <code>object</code> |  | Orders the segment jobs returned. Is written in the format [attributeName]:[desc|asc]. |
+| [options.property] | <code>object</code> |  | Filters segment jobs and gets exact matches for the filter given. It can be written in either of the following formats:[jsonObjectPath]==[value] - filtering on the object key or[arrayTypeAttributeName]~[objectKey]==[value] - filtering within the array |
+| [options.headers] | <code>object</code> |  | headers to pass to API call |
 
 <a name="responseBodyToString"></a>
 
@@ -192,20 +177,6 @@ Converts a fetch Request object to a string.
 | Param | Type | Description |
 | --- | --- | --- |
 | request | <code>Request</code> | the request object |
-
-<a name="init"></a>
-
-## init(tenantId, apiKey, accessToken) ⇒ [<code>Promise.&lt;SegmentationServiceAPI&gt;</code>](#SegmentationServiceAPI)
-Returns a Promise that resolves with a new SegmentationServiceAPI object.
-
-**Kind**: global function  
-**Returns**: [<code>Promise.&lt;SegmentationServiceAPI&gt;</code>](#SegmentationServiceAPI) - a Promise with a SegmentationServiceAPI object  
-
-| Param | Type | Description |
-| --- | --- | --- |
-| tenantId | <code>string</code> | the tenant id |
-| apiKey | <code>string</code> | the API key for your integration |
-| accessToken | <code>string</code> | the access token for your integration |
 
 <a name="MyParameters"></a>
 
