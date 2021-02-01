@@ -10,7 +10,6 @@ governing permissions and limitations under the License.
 */
 
 const fetchMock = require("fetch-mock");
-const { createRequestOptions } = require("../src/helpers");
 const { codes } = require("../src/SDKErrors");
 const mock = require("./mocks");
 const sdk = require("../src");
@@ -22,16 +21,7 @@ const gApiKey = "test-apiKey";
 const gAccessToken = "test-accessToken";
 const gSandbox = "test-sandbox";
 
-const createSwaggerOptions = ({ body } = {}) => {
-  return createRequestOptions({
-    tenantId: gTenantId,
-    imsOrgId: gImsOrgId,
-    sandbox: gSandbox,
-    apiKey: gApiKey,
-    accessToken: gAccessToken,
-    body,
-  });
-};
+let sdkClient = {}
 
 const createSdkClient = async () => {
   return sdk.init(gTenantId, gImsOrgId, gApiKey, gAccessToken, gSandbox);
@@ -43,16 +33,6 @@ function mockResponseWithMethod(url, method, response) {
   fetchMock.mock((u, opts) => u === url && opts.method === method, response);
 }
 
-test("sdk init test", async () => {
-  const sdkClient = await createSdkClient();
-
-  expect(sdkClient.tenantId).toBe(gTenantId);
-  expect(sdkClient.apiKey).toBe(gApiKey);
-  expect(sdkClient.imsOrgId).toBe(gImsOrgId);
-  expect(sdkClient.accessToken).toBe(gAccessToken);
-  expect(sdkClient.sandbox).toBe(gSandbox);
-
-});
 
 test("sdk init test - no tenantId", async () => {
   return expect(
@@ -86,19 +66,29 @@ test("sdk init test - no accessToken", async () => {
   );
 });
 
-test.only("test getSegmentJobs", async () => {
-  const sdkClient = await createSdkClient();
+test("sdk init test", async () => {
+  sdkClient = await createSdkClient();
 
+  expect(sdkClient.tenantId).toBe(gTenantId);
+  expect(sdkClient.apiKey).toBe(gApiKey);
+  expect(sdkClient.imsOrgId).toBe(gImsOrgId);
+  expect(sdkClient.accessToken).toBe(gAccessToken);
+  expect(sdkClient.sandbox).toBe(gSandbox);
+
+});
+
+test.only("test getSegmentJobs", async () => {
+  sdkClient = await createSdkClient()
   const url = "https://platform.adobe.io/data/core/ups/segment/jobs";
   const method = "GET";
-  const api = "get";
+  const api = "getSegmentJobs";
 
   mockResponseWithMethod(url, method, mock.data.segmentJobs);
   // check success response
   var res = await sdkClient.getSegmentJobs();
-  expect(res.body.total).toBe(2);
-  expect(res.body.limit).toBe(10);
-  expect(res.body.activities.length).toBe(2);
+  expect(res.body._page.totalCount).toBe(1);
+  expect(res.body.children.length).toBe(1);
+  //TODO add more checks as per return response
 
   // check error responses
   mockResponseWithMethod(url, method, mock.errors.Unauthorized_Request.err);
@@ -125,76 +115,35 @@ test.only("test getSegmentJobs", async () => {
 });
 
 test("test __setHeader preset api key header", async () => {
-  sdkClient = await createSdkClient();
   const req = { headers: { "x-api-key": "test" } };
   sdkClient.__setHeaders(req, sdkClient, {});
   expect(req.headers["x-api-key"]).toBe("test");
 });
 
 test("test __setHeader preset authorization header", async () => {
-  sdkClient = await createSdkClient();
   const req = { headers: { Authorization: "test" } };
   sdkClient.__setHeaders(req, sdkClient, {});
   expect(req.headers.Authorization).toBe("test");
 });
 
-/** @private */
-async function standardTest({
-  fullyQualifiedApiName,
-  apiParameters,
-  apiOptions,
-  sdkFunctionName,
-  sdkArgs,
-  successReturnValue = {},
-  ErrorClass,
-}) {
-  const sdkClient = await createSdkClient();
-  const [, apiFunction] = fullyQualifiedApiName.split(".");
-
-  if (!ErrorClass) {
-    throw new Error("ErrorClass not defined for standardTest");
-  }
-
-  // sdk function name is the same as the apiname (without the namespace) by default
-  // so if it is not set, we set it
-  // this means in the SDK the namespace is flattened, so functions have to have unique names
-  if (!sdkFunctionName) {
-    sdkFunctionName = apiFunction;
-  }
-  const fn = sdkClient[sdkFunctionName];
-  let mockFn;
-
-  // success case
-  mockFn = sdkClient.sdk.mockResolved(
-    fullyQualifiedApiName,
-    successReturnValue
-  );
-  await expect(fn.apply(sdkClient, sdkArgs)).resolves.toEqual(
-    successReturnValue
-  );
-  expect(mockFn).toHaveBeenCalledWith(apiParameters, apiOptions);
-
-  // failure case
-  const err = new Error("some API error");
-  mockFn = sdkClient.sdk.mockRejected(fullyQualifiedApiName, err);
-  await expect(fn.apply(sdkClient, sdkArgs)).rejects.toEqual(
-    new ErrorClass({ sdkDetails: { ...sdkArgs }, messageValues: err })
-  );
-  expect(mockFn).toHaveBeenCalledWith(apiParameters, apiOptions);
+/**
+ * @param fn
+ * @param url
+ * @param method
+ * @param error
+ * @param args
+ */
+function checkErrorResponse (fn, url, method, error, args = []) {
+  const client = sdkClient
+  return new Promise((resolve, reject) => {
+    (client[fn](args[0], args[1]))
+      .then(res => {
+        reject(new Error(' No error response'))
+      })
+      .catch(e => {
+        expect(e.name).toEqual(error.name)
+        expect(e.code).toEqual(error.code)
+        resolve()
+      })
+  })
 }
-
-test("getSomething", async () => {
-  const sdkArgs = [];
-  const apiParameters = {};
-  const apiOptions = createSwaggerOptions();
-
-  return expect(() =>
-    standardTest({
-      fullyQualifiedApiName: "mytag.getSomething",
-      apiParameters,
-      apiOptions,
-      sdkArgs,
-      ErrorClass: codes.ERROR_GET_SOMETHING,
-    })
-  ).not.toThrow();
-});

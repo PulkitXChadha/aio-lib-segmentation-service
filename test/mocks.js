@@ -47,8 +47,8 @@ const ServerUnavailable = {
 };
 const segmentJobs = {
   _page: {
-    totalCount: 14,
-    pageSize: 14,
+    totalCount: 1,
+    pageSize: 1,
   },
   children: [
     {
