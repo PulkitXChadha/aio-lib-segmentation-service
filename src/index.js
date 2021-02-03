@@ -157,10 +157,6 @@ class SegmentationServiceAPI {
       req.headers[key] = headers[key]
     })
   }
-
-  __getAcceptHeader( value ) {
-    return { accept: value }
-  }
 }
 module.exports = {
   init: init

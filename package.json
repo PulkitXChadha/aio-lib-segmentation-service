@@ -22,7 +22,8 @@
     "typings": "jsdoc -t node_modules/tsd-jsdoc/dist -r src/*.js -d .",
     "unit-tests": "jest --config test/jest.config.js --maxWorkers=2",
     "validate": "node bin/validate_spec.js spec/api.json",
-    "unit-tests-silent": "jest --silent=false"
+    "unit-tests-silent": "jest --silent=false",
+    "test-coverage": "jest --collectCoverage=true"
   },
   "dependencies": {
     "@adobe/aio-lib-core-errors": "^3.0.0",

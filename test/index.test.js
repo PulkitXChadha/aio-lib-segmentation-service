@@ -88,30 +88,14 @@ test('test getSegmentJobs', async () => {
   var res = await sdkClient.getSegmentJobs()
   expect(res.body._page.totalCount).toBe(1)
   expect(res.body.children.length).toBe(1)
-  //TODO add more checks as per return response
-
+  
   // check error responses
   mockResponseWithMethod(url, method, mock.errors.Unauthorized_Request.err)
-  res = await checkErrorResponse(
-    api,
-    url,
-    method,
-    new errorSDK.codes.ERROR_GET_SEGMENTJOBS()
-  )
+  res = await checkErrorResponse(api,url,method,new errorSDK.codes.ERROR_GET_SEGMENTJOBS())
   mockResponseWithMethod(url, method, mock.errors.Forbidden_Request.err)
-  res = await checkErrorResponse(
-    api,
-    url,
-    method,
-    new errorSDK.codes.ERROR_GET_SEGMENTJOBS()
-  )
+  res = await checkErrorResponse(api,url,method,new errorSDK.codes.ERROR_GET_SEGMENTJOBS())
   mockResponseWithMethod(url, method, mock.errors.Internal_Server_Error.err)
-  res = await checkErrorResponse(
-    api,
-    url,
-    method,
-    new errorSDK.codes.ERROR_GET_SEGMENTJOBS()
-  )
+  res = await checkErrorResponse(api,url,method,new errorSDK.codes.ERROR_GET_SEGMENTJOBS())
 })
 
 test('test __setHeader preset api key header', async () => {
