@@ -8,107 +8,150 @@ the License is distributed on an 'AS IS' BASIS, WITHOUT WARRANTIES OR REPRESENTA
 OF ANY KIND, either express or implied. See the License for the specific language
 governing permissions and limitations under the License.
 */
+const helpers = require("../src/helpers");
+helpers.requestInterceptor = jest.fn();
 
-const fetchMock = require('fetch-mock')
-const { codes } = require('../src/SDKErrors')
-const mock = require('./mocks')
-const sdk = require('../src')
-const errorSDK = require('../src/SDKErrors')
+beforeEach(() => {
+  helpers.requestInterceptor.mockReset();
+});
 
-const gTenantId = 'test-tenantId'
-const gImsOrgId = 'test-imsOrg'
-const gApiKey = 'test-apiKey'
-const gAccessToken = 'test-accessToken'
-const gSandbox = 'test-sandbox'
+const fetchMock = require("fetch-mock");
+const { codes } = require("../src/SDKErrors");
+const mock = require("./mocks");
+const sdk = require("../src");
+const errorSDK = require("../src/SDKErrors");
 
-let sdkClient = {}
+const gTenantId = "test-tenantId";
+const gImsOrgId = "test-imsOrg";
+const gApiKey = "test-apiKey";
+const gAccessToken = "test-accessToken";
+const gSandbox = "test-sandbox";
+
+let sdkClient = {};
 
 const createSdkClient = async () => {
-  return sdk.init(gTenantId, gImsOrgId, gApiKey, gAccessToken, gSandbox)
-}
+  return sdk.init(gTenantId, gImsOrgId, gApiKey, gAccessToken, gSandbox);
+};
 
 /** @private */
 function mockResponseWithMethod(url, method, response) {
-  fetchMock.reset()
-  fetchMock.mock((u, opts) => u === url && opts.method === method, response)
+  fetchMock.reset();
+  fetchMock.mock((u, opts) => u === url && opts.method === method, response);
 }
 
-
-test('sdk init test - no tenantId', async () => {
+test("sdk init test - no tenantId", async () => {
   return expect(
     sdk.init(null, gImsOrgId, gApiKey, gAccessToken, gSandbox)
   ).rejects.toEqual(
-    new codes.ERROR_SDK_INITIALIZATION({ messageValues: 'tenantId' })
-  )
-})
+    new codes.ERROR_SDK_INITIALIZATION({ messageValues: "tenantId" })
+  );
+});
 
-test('sdk init test - no imsOrgId', async () => {
+test("sdk init test - no imsOrgId", async () => {
   return expect(
     sdk.init(gTenantId, null, gApiKey, gAccessToken, gSandbox)
   ).rejects.toEqual(
-    new codes.ERROR_SDK_INITIALIZATION({ messageValues: 'imsOrgId' })
-  )
-})
+    new codes.ERROR_SDK_INITIALIZATION({ messageValues: "imsOrgId" })
+  );
+});
 
-test('sdk init test - no apiKey', async () => {
+test("sdk init test - no apiKey", async () => {
   return expect(
     sdk.init(gTenantId, gImsOrgId, null, gAccessToken, gSandbox)
   ).rejects.toEqual(
-    new codes.ERROR_SDK_INITIALIZATION({ messageValues: 'apiKey' })
-  )
-})
+    new codes.ERROR_SDK_INITIALIZATION({ messageValues: "apiKey" })
+  );
+});
 
-test('sdk init test - no accessToken', async () => {
+test("sdk init test - no accessToken", async () => {
   return expect(
     sdk.init(gTenantId, gImsOrgId, gApiKey, null, gSandbox)
   ).rejects.toEqual(
-    new codes.ERROR_SDK_INITIALIZATION({ messageValues: 'accessToken' })
-  )
-})
+    new codes.ERROR_SDK_INITIALIZATION({ messageValues: "accessToken" })
+  );
+});
 
-test('sdk init test', async () => {
-  sdkClient = await createSdkClient()
+test("sdk init test", async () => {
+  sdkClient = await createSdkClient();
 
-  expect(sdkClient.tenantId).toBe(gTenantId)
-  expect(sdkClient.apiKey).toBe(gApiKey)
-  expect(sdkClient.imsOrgId).toBe(gImsOrgId)
-  expect(sdkClient.accessToken).toBe(gAccessToken)
-  expect(sdkClient.sandbox).toBe(gSandbox)
+  expect(sdkClient.tenantId).toBe(gTenantId);
+  expect(sdkClient.apiKey).toBe(gApiKey);
+  expect(sdkClient.imsOrgId).toBe(gImsOrgId);
+  expect(sdkClient.accessToken).toBe(gAccessToken);
+  expect(sdkClient.sandbox).toBe(gSandbox);
+});
 
-})
+test("test getSegmentJobs with sandbox", async () => {
+  sdkClient = await createSdkClient();
+  const url = "https://platform.adobe.io/data/core/ups/segment/jobs";
+  const method = "GET";
+  const api = "getSegmentJobs";
 
-test('test getSegmentJobs', async () => {
-  sdkClient = await createSdkClient()
-  const url = 'https://platform.adobe.io/data/core/ups/segment/jobs'
-  const method = 'GET'
-  const api = 'getSegmentJobs'
-
-  mockResponseWithMethod(url, method, mock.data.segmentJobs)
+  mockResponseWithMethod(url, method, mock.data.segmentJobs);
   // check success response
-  var res = await sdkClient.getSegmentJobs()
-  expect(res.body._page.totalCount).toBe(1)
-  expect(res.body.children.length).toBe(1)
-  
+  var res = await sdkClient.getSegmentJobs();
+  expect(res.body._page.totalCount).toBe(1);
+  expect(res.body.children.length).toBe(1);
+
   // check error responses
-  mockResponseWithMethod(url, method, mock.errors.Unauthorized_Request.err)
-  res = await checkErrorResponse(api,url,method,new errorSDK.codes.ERROR_GET_SEGMENTJOBS())
-  mockResponseWithMethod(url, method, mock.errors.Forbidden_Request.err)
-  res = await checkErrorResponse(api,url,method,new errorSDK.codes.ERROR_GET_SEGMENTJOBS())
-  mockResponseWithMethod(url, method, mock.errors.Internal_Server_Error.err)
-  res = await checkErrorResponse(api,url,method,new errorSDK.codes.ERROR_GET_SEGMENTJOBS())
-})
+  mockResponseWithMethod(url, method, mock.errors.Unauthorized_Request.err);
+  res = await checkErrorResponse(
+    api,
+    url,
+    method,
+    new errorSDK.codes.ERROR_GET_SEGMENTJOBS()
+  );
+  mockResponseWithMethod(url, method, mock.errors.Forbidden_Request.err);
+  res = await checkErrorResponse(
+    api,
+    url,
+    method,
+    new errorSDK.codes.ERROR_GET_SEGMENTJOBS()
+  );
+  mockResponseWithMethod(url, method, mock.errors.Internal_Server_Error.err);
+  res = await checkErrorResponse(
+    api,
+    url,
+    method,
+    new errorSDK.codes.ERROR_GET_SEGMENTJOBS()
+  );
+});
 
-test('test __setHeader preset api key header', async () => {
-  const req = { headers: { 'x-api-key': 'test' } }
-  sdkClient.__setHeaders(req, sdkClient, {})
-  expect(req.headers['x-api-key']).toBe('test')
-})
+test("test getSegmentJobs without sandbox", async () => {
+  sdkClient = await sdk.init(gTenantId, gImsOrgId, gApiKey, gAccessToken);
+  const url = "https://platform.adobe.io/data/core/ups/segment/jobs";
+  const method = "GET";
+  const api = "getSegmentJobs";
 
-test('test __setHeader preset authorization header', async () => {
-  const req = { headers: { Authorization: 'test' } }
-  sdkClient.__setHeaders(req, sdkClient, {})
-  expect(req.headers.Authorization).toBe('test')
-})
+  mockResponseWithMethod(url, method, mock.data.segmentJobs);
+  // check success response
+  var res = await sdkClient.getSegmentJobs();
+  expect(res.body._page.totalCount).toBe(1);
+  expect(res.body.children.length).toBe(1);
+
+  // check error responses
+  mockResponseWithMethod(url, method, mock.errors.Unauthorized_Request.err);
+  res = await checkErrorResponse(
+    api,
+    url,
+    method,
+    new errorSDK.codes.ERROR_GET_SEGMENTJOBS()
+  );
+  mockResponseWithMethod(url, method, mock.errors.Forbidden_Request.err);
+  res = await checkErrorResponse(
+    api,
+    url,
+    method,
+    new errorSDK.codes.ERROR_GET_SEGMENTJOBS()
+  );
+  mockResponseWithMethod(url, method, mock.errors.Internal_Server_Error.err);
+  res = await checkErrorResponse(
+    api,
+    url,
+    method,
+    new errorSDK.codes.ERROR_GET_SEGMENTJOBS()
+  );
+});
 
 /**
  * @param fn
@@ -117,17 +160,17 @@ test('test __setHeader preset authorization header', async () => {
  * @param error
  * @param args
  */
-function checkErrorResponse (fn, url, method, error, args = []) {
-  const client = sdkClient
+function checkErrorResponse(fn, url, method, error, args = []) {
+  const client = sdkClient;
   return new Promise((resolve, reject) => {
-    (client[fn](args[0], args[1]))
-      .then(res => {
-        reject(new Error(' No error response'))
+    client[fn](args[0], args[1])
+      .then((res) => {
+        reject(new Error(" No error response"));
       })
-      .catch(e => {
-        expect(e.name).toEqual(error.name)
-        expect(e.code).toEqual(error.code)
-        resolve()
-      })
-  })
+      .catch((e) => {
+        expect(e.name).toEqual(error.name);
+        expect(e.code).toEqual(error.code);
+        resolve();
+      });
+  });
 }

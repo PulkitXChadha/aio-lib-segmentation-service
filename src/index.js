@@ -9,13 +9,13 @@ OF ANY KIND, either express or implied. See the License for the specific languag
 governing permissions and limitations under the License.
 */
 
-const Swagger = require('swagger-client')
-const { codes } = require('./SDKErrors')
-const loggerNamespace = '@adobe/aio-lib-segmentation-service'
-const logger = require('@adobe/aio-lib-core-logging')(loggerNamespace, {
-  level: process.env.LOG_LEVEL
-})
-
+const Swagger = require("swagger-client");
+const { codes } = require("./SDKErrors");
+const loggerNamespace = "@adobe/aio-lib-segmentation-service";
+const logger = require("@adobe/aio-lib-core-logging")(loggerNamespace, {
+  level: process.env.LOG_LEVEL,
+});
+const { requestInterceptor } = require("./helpers");
 /**
  * Returns a Promise that resolves with a new SegmentationServiceAPI object.
  *
@@ -27,20 +27,20 @@ const logger = require('@adobe/aio-lib-core-logging')(loggerNamespace, {
  * @returns {Promise<SegmentationServiceAPI>} a Promise with a SegmentationServiceAPI object
  */
 
-function init (tenantId, imsOrgId, apiKey, accessToken, sandbox) {
-  return new Promise(( resolve, reject ) => {
-    const clientWrapper = new SegmentationServiceAPI()
+function init(tenantId, imsOrgId, apiKey, accessToken, sandbox) {
+  return new Promise((resolve, reject) => {
+    const clientWrapper = new SegmentationServiceAPI();
     clientWrapper
       .init(tenantId, imsOrgId, apiKey, accessToken, sandbox)
       .then((initializedSDK) => {
-        logger.debug('sdk initialized successfully')
-        resolve(initializedSDK)
+        logger.debug("sdk initialized successfully");
+        resolve(initializedSDK);
       })
       .catch((err) => {
-        logger.debug(`sdk init error: ${err}`)
-        reject(err)
-      })
-  })
+        logger.debug(`sdk init error: ${err}`);
+        reject(err);
+      });
+  });
 }
 
 /**
@@ -59,41 +59,67 @@ class SegmentationServiceAPI {
    * @param {string} [sandbox] sandbox name
    * @returns {Promise<SegmentationServiceAPI>} a SegmentationServiceAPI object
    */
-  async init( tenantId, imsOrgId, apiKey, accessToken, sandbox ) {
-    const initErrors = []
+  async init(tenantId, imsOrgId, apiKey, accessToken, sandbox) {
+    const initErrors = [];
     if (!tenantId) {
-      initErrors.push('tenantId')
+      initErrors.push("tenantId");
     }
     if (!imsOrgId) {
-      initErrors.push('imsOrgId')
+      initErrors.push("imsOrgId");
     }
     if (!apiKey) {
-      initErrors.push('apiKey')
+      initErrors.push("apiKey");
     }
     if (!accessToken) {
-      initErrors.push('accessToken')
+      initErrors.push("accessToken");
     }
 
     if (initErrors.length) {
-      const sdkDetails = { tenantId, imsOrgId, apiKey, accessToken, sandbox }
+      const sdkDetails = { tenantId, imsOrgId, apiKey, accessToken, sandbox };
       throw new codes.ERROR_SDK_INITIALIZATION({
         sdkDetails,
-        messageValues: `${initErrors.join(', ')}`
-      })
+        messageValues: `${initErrors.join(", ")}`,
+      });
     }
     // init swagger client
-    const spec = require('../spec/api.json')
+    const spec = require("../spec/api.json");
     const swagger = new Swagger({
       spec: spec,
-      usePromise: true
-    })
-    this.sdk = await swagger
-    this.tenantId = tenantId
-    this.imsOrgId = imsOrgId
-    this.apiKey = apiKey
-    this.accessToken = accessToken
-    this.sandbox = sandbox || 'prod'
-    return this
+      requestInterceptor: (req) => requestInterceptor(req, accessToken),
+      usePromise: true,
+    });
+    this.sdk = await swagger;
+    /**
+     * the tenant id.
+     *
+     * @type {string}
+     */
+    this.tenantId = tenantId;
+    /**
+     * the organization id.
+     *
+     * @type {string}
+     */
+    this.imsOrgId = imsOrgId;
+    /**
+     *the API key for your integration.
+     *
+     * @type {string}
+     */
+    this.apiKey = apiKey;
+    /**
+     * the access token for your integration.
+     *
+     * @type {string}
+     */
+    this.accessToken = accessToken;
+    /**
+     * the sandbox name.
+     *
+     * @type {string}
+     */
+    this.sandbox = sandbox || "prod";
+    return this;
   }
 
   /** Get Segment Jobs
@@ -108,56 +134,33 @@ class SegmentationServiceAPI {
    * @param {object} [options.headers] headers to pass to API call
    * @returns {Promise<Response>} a Promise resolving to a Response
    */
-  getSegmentJobs( options = { start: 0, limit: 100 } ) {
-    const sdkDetails = options
-    const headers = options.headers ? options.headers : {}
+  getSegmentJobs(options = { start: 0, limit: 100 }) {
+    const params = {};
+    params["x-gw-ims-org-id"] = this.orgId;
+    params["x-api-key"] = this.apiKey;
+    params["x-sandbox-name"] = this.sandbox;
+    params["Content-Type"] = "application/json";
+    params["Authorization"] = "Bearer " + this.accessToken;
+    const sdkDetails = {
+      ...options,
+      orgId: this.orgId,
+      apiKey: this.apiKey,
+      sandbox: this.sandbox,
+    };
     return new Promise((resolve, reject) => {
       this.sdk.apis.segmentJobs
-        .get(this.__createRequest({}, headers))
+        .get(params)
         .then((response) => {
-          resolve(response)
+          resolve(response);
         })
         .catch((err) => {
           reject(
             new codes.ERROR_GET_SEGMENTJOBS({ sdkDetails, messageValues: err })
-          )
-        })
-    })
-  }
-
-  __createRequest( body, headers ) {
-    const finalHeaders = Object.assign(headers)
-    return {
-      requestBody: body,
-      server: 'https://platform.adobe.io/data/core/ups',
-      requestInterceptor: (req) => {
-        this.__setHeaders(req, this, finalHeaders)
-      }
-    }
-  }
-
-  __setHeaders( req, coreAPIInstance, headers ) {
-    // set headers required for Segmentation API calls
-    if (!req.headers['x-api-key']) {
-      req.headers['x-api-key'] = coreAPIInstance.apiKey
-    }
-    if (!req.headers.Authorization) {
-      req.headers.Authorization = 'Bearer ' + coreAPIInstance.accessToken
-    }
-    if (!req.headers['x-gw-ims-org-id']) {
-      req.headers['x-gw-ims-org-id'] = coreAPIInstance.imsOrgId
-    }
-    if (!req.headers['x-sandbox-name']) {
-      req.headers['x-sandbox-name'] = coreAPIInstance.sandbox
-    }
-    if (!req.headers['Content-Type']) {
-      req.headers['Content-Type'] = 'application/json'
-    }
-    Object.keys(headers).forEach(function (key) {
-      req.headers[key] = headers[key]
-    })
+          );
+        });
+    });
   }
 }
 module.exports = {
-  init: init
-}
+  init: init,
+};
